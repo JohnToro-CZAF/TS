@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import importlib
+import inspect
 import json
 import sys
 from datetime import timedelta
@@ -24,8 +25,14 @@ def read_input(json_filename: str) -> dict:
         module = importlib.import_module("evaluators")
         evaluator_class_name = input_data["evaluator_class_name"]
         class_ = getattr(module, evaluator_class_name)
-        evaluator_arg = input_data["evaluator_arg"]
-        evaluator = class_(evaluator_arg)
+        evaluator_arg = input_data.get("evaluator_arg", {})
+        if evaluator_arg is None:
+            evaluator = class_()
+        elif evaluator_arg == {}:
+            evaluator = class_()
+        else:
+            evaluator = class_(evaluator_arg)
+
         input_data['evaluator_class'] = evaluator
     return input_data
 
